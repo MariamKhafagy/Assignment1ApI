@@ -2,14 +2,19 @@
 using DomainLayer.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using PersistenceLayer;
 using PersistenceLayer.Data;
+using ServiceAbstractionLayer;
+using ServiceLayer;
+using ServiceLayer.MappingProfiles;
+using System.Threading.Tasks;
 
 namespace TalabatDemo
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -24,21 +29,37 @@ namespace TalabatDemo
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnecions"));
 
             });
+            #region Register User_defined Services
             builder.Services.AddScoped<IDataSeeding, DataSeeding>();
+            builder.Services.AddScoped<IUnitOfWork, IUnitOfWork>();
+
+            #region Mapping Regiser
+            // builder.Services.AddAutoMapper(p => p.AddProfile(new ProductProfile()));
+            // builder.Services.AddAutoMapper(p => p.AddProfile(new OrderProfile()));
+            // builder.Services.AddAutoMapper(p => p.AddProfiles(new ProductProfile()));
+
+            #endregion
+
+            builder.Services.AddAutoMapper((x) => {  },typeof(ServiceLayerAssemblyReference).Assembly);
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
 
             #endregion
+            #endregion
             var app = builder.Build();
 
-           using  var scope= app.Services.CreateScope();
+            #region Data Seeding
+
+            using var scope= app.Services.CreateScope();
            var seedObj= scope.ServiceProvider.GetRequiredService<IDataSeeding>();
-            seedObj.DataSeed();
+           await seedObj.DataSeedAsync();
+            #endregion
 
-
-            // Configure the HTTP request pipeline.
+            #region Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                
                 
             }
 
@@ -50,6 +71,8 @@ namespace TalabatDemo
             app.MapControllers();
 
             app.Run();
+            #endregion
+
         }
     }
 }

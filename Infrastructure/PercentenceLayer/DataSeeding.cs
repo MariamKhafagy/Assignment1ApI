@@ -1,6 +1,7 @@
 ﻿using DomainLayer.Contracts;
 using DomainLayer.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PersistenceLayer.Data;
 using System;
 using System.Collections.Generic;
@@ -11,61 +12,71 @@ using System.Threading.Tasks;
 
 namespace PersistenceLayer
 {
-    public class DataSeeding (StoreDbContext _storeDbContext):IDataSeeding
+    public class DataSeeding :IDataSeeding
     {
-        public void DataSeed()
+
+        private readonly StoreDbContext _storeDbContext;
+
+        public DataSeeding(StoreDbContext storeDbContext)
         {
-            try
-            {
-                if (_storeDbContext.Database.GetPendingMigrations().Any())
+            _storeDbContext = storeDbContext;
+        }
+
+        public async Task DataSeedAsync()
+        {
+            
+            
+            
+                 //Production
+                if ((await _storeDbContext.Database.GetPendingMigrationsAsync()).Any())
                 {
-                    _storeDbContext.Database.Migrate();
+                   await _storeDbContext.Database.MigrateAsync();
                 }
 
                 if (!_storeDbContext.ProductBrands.Any())
                 {
-                    var productBrandsData = File.ReadAllText(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\brands.json");
+                   // var productBrandsData = await File.ReadAllTextAsync(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\brands.json");
+                    var productBrandsData =  File.OpenRead(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\brands.json");
+
                     //Convert String To C# Object
-                    var brands = JsonSerializer.Deserialize<List<ProductBrand>>(productBrandsData);
+                    var brands =   await JsonSerializer.DeserializeAsync<List<ProductBrand>>(productBrandsData);
 
                     if (brands is not null && brands.Any())
                     {
-                        _storeDbContext.ProductBrands.AddRange(brands);
+                      await  _storeDbContext.AddRangeAsync(brands);
                     }
                 }
 
                 if (!_storeDbContext.ProductTypes.Any())
                 {
-                    var productTypessData = File.ReadAllText(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\types.json");
+                    var productTypessData = File.OpenRead(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\types.json");
                     //Convert String To C# Object
-                    var types = JsonSerializer.Deserialize<List<ProductType>>(productTypessData);
+                    var types =  await JsonSerializer.DeserializeAsync<List<ProductType>>(productTypessData);
 
                     if (types is not null && types.Any())
                     {
-                        _storeDbContext.ProductTypes.AddRange(types);
+                       await _storeDbContext.AddRangeAsync(types);
                     }
                 }
 
                 if (!_storeDbContext.Products.Any())
                 {
-                    var productsData = File.ReadAllText(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\products.json");
+                    var productsData = File.OpenRead(@"..\Infrastructure\PercentenceLayer\Data\DataSeed\products.json");
                     //Convert String To C# Object
-                    var products = JsonSerializer.Deserialize<List<Product>>(productsData);
+                    var products = await JsonSerializer.DeserializeAsync<List<Product>>(productsData);
 
                     if (products is not null && products.Any())
                     {
-                        _storeDbContext.Products.AddRange(products);
+                       await _storeDbContext.AddRangeAsync(products);
                     }
                 }
-                _storeDbContext.SaveChanges();
+               await _storeDbContext.SaveChangesAsync();
 
-            }
-            catch (Exception)
-            { 
-              //ToDo 
-            }
+            
+           
         }
 
        
     }
+
 }
