@@ -11,8 +11,8 @@ using PersistenceLayer.Data;
 namespace PersistenceLayer.Data.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20251027193230_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251102135647_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,8 +43,9 @@ namespace PersistenceLayer.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("PictureUrl")
-                        .HasColumnType("int");
+                    b.Property<string>("PictureUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");

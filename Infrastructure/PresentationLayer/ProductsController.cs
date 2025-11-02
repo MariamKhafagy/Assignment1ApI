@@ -1,4 +1,6 @@
-﻿using ServiceAbstractionLayer;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServiceAbstractionLayer;
+using Shared.DTOS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +10,43 @@ using System.Threading.Tasks;
 
 namespace PresentationLayer
 {
-    public class ProductsController (IServiceManager _serviceManager) : ControllerBase
+    [ApiController]
+    [Route("api/[Controller]")]
+    public class ProductsController(IServiceManager _serviceManager) : ControllerBase
     {
+        //Get All Products 
+        [HttpGet] //Get :: BaseUrl/api/Products
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
+        {
+            var products =await _serviceManager.ProductService.GetAllProductsAsync();
+            return Ok(products);
+        }
+
+
+        //Get Products By Id 
+        [HttpGet("{id}")] //Get :: BaseUrl/api/Products/4
+        public async Task<ActionResult<ProductDto>> GetProductById(int id)
+        { 
+          var product   =  await  _serviceManager.ProductService.GetProductByIdAsync(id);
+            return Ok(product);
+        }
+
+        //Get All Brands 
+        [HttpGet("brands")] //Get :: BaseUrl/api/Products/brands
+        public async Task<ActionResult<BrandDto>> GetAllBrands()
+        { 
+          var brands= await _serviceManager.ProductService.GetAllBrandsAsync();
+            return Ok(brands);
+        }
+
+        //Get All Types 
+        [HttpGet("types")] //Get :: BaseUrl/api/Products/types
+        public async Task<ActionResult<TypeDto>> GetAllTypes()
+        {
+          var types= await _serviceManager.ProductService.GetAllTypesAsync();
+            return Ok(types);
+        }
+
 
     }
 }

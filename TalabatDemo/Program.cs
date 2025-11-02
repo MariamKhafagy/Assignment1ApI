@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using PersistenceLayer;
 using PersistenceLayer.Data;
+using PersistenceLayer.Repositories;
 using ServiceAbstractionLayer;
 using ServiceLayer;
 using ServiceLayer.MappingProfiles;
@@ -19,7 +20,7 @@ namespace TalabatDemo
             var builder = WebApplication.CreateBuilder(args);
 
             // 
-            #region Add services to the container.
+            #region Add services to the DI container.
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -31,7 +32,8 @@ namespace TalabatDemo
             });
             #region Register User_defined Services
             builder.Services.AddScoped<IDataSeeding, DataSeeding>();
-            builder.Services.AddScoped<IUnitOfWork, IUnitOfWork>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
             #region Mapping Regiser
             // builder.Services.AddAutoMapper(p => p.AddProfile(new ProductProfile()));
@@ -67,7 +69,7 @@ namespace TalabatDemo
 
            // app.UseAuthorization();
 
-
+            app.UseStaticFiles();
             app.MapControllers();
 
             app.Run();

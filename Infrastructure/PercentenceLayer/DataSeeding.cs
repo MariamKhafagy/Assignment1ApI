@@ -70,13 +70,36 @@ namespace PersistenceLayer
                        await _storeDbContext.AddRangeAsync(products);
                     }
                 }
-               await _storeDbContext.SaveChangesAsync();
+            try
+            {
+                await _storeDbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" SaveChanges failed:");
+                Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
+                throw;
+            }
+            try
+            {
+                await _storeDbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ SaveChanges failed:");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("---- INNER EXCEPTION ----");
+                Console.WriteLine(ex.InnerException?.Message);
+                Console.WriteLine("---- STACK TRACE ----");
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
 
-            
-           
+
+
         }
 
-       
+
     }
 
 }

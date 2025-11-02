@@ -40,8 +40,9 @@ namespace PersistenceLayer.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("PictureUrl")
-                        .HasColumnType("int");
+                    b.Property<string>("PictureUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");
