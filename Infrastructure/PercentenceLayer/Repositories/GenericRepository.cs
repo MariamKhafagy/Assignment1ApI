@@ -12,7 +12,8 @@ namespace PersistenceLayer.Repositories
 {
     public class GenericRepository<TEntity, TKey> (StoreDbContext _dbContext)
         : IGenericRepository<TEntity, TKey>
-        where TEntity : BaseEntity<TKey>
+        where TEntity : BaseEntity<TKey>  
+
     {
         public async Task AddAsync(TEntity entity) 
               => await _dbContext.Set<TEntity>().AddAsync(entity);
