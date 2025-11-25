@@ -1,15 +1,22 @@
 
+using Azure;
 using DomainLayer.Contracts;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.IdentityModel.Tokens.Experimental;
 using PersistenceLayer;
 using PersistenceLayer.Data;
 using PersistenceLayer.Repositories;
 using ServiceAbstractionLayer;
 using ServiceLayer;
 using ServiceLayer.MappingProfiles;
+using Shared.Error_Models;
 using System.Threading.Tasks;
+using TalabatDemo.CustomMiddleWares;
+using TalabatDemo.Factories;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TalabatDemo
 {
@@ -25,15 +32,16 @@ namespace TalabatDemo
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnecions"));
+            //builder.Services.AddDbContext<StoreDbContext>(options =>
+            //{
+            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnecions"));
 
-            });
+            //});
             #region Register User_defined Services
-            builder.Services.AddScoped<IDataSeeding, DataSeeding>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            // builder.Services.AddScoped<IDataSeeding, DataSeeding>();
+            // builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            builder.Services.AddInfraStructureService(builder.Configuration);
 
             #region Mapping Regiser
             // builder.Services.AddAutoMapper(p => p.AddProfile(new ProductProfile()));
@@ -42,9 +50,18 @@ namespace TalabatDemo
 
             #endregion
 
-            builder.Services.AddAutoMapper((x) => {  },typeof(ServiceLayerAssemblyReference).Assembly);
+            builder.Services.AddAutoMapper((x) => { }, typeof(ServiceLayerAssemblyReference).Assembly);
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
+
+            
+
+            builder.Services.Configure<ApiBehaviorOptions>((options) =>
+            {
+                options.InvalidModelStateResponseFactory = ApiResponseFactory.GenerateApiValidationErrorResponse;
+               
+
+            });
 
             #endregion
             #endregion
@@ -58,6 +75,21 @@ namespace TalabatDemo
             #endregion
 
             #region Configure the HTTP request pipeline.
+
+            #region This code is Changed by try and catch in CustomExclass
+            //app.Use(async (RequestContext, NextMiddleWare) =>
+            //{
+            //    Console.WriteLine("Request Under Processing");
+            //    await NextMiddleWare.Invoke();
+            //    Console.WriteLine("waiting Responce");
+
+
+            //});
+
+            #endregion  
+
+            app.UseMiddleware<CustomExceptionHandlerMiddleWare>();
+
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();

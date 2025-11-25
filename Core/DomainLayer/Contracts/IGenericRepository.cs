@@ -26,7 +26,7 @@ namespace DomainLayer.Contracts
         Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity, TKey> specifications);
 
         Task<int> CountAsync(ISpecifications<TEntity, TKey> specifications);
-        Task CountAsync(object countSpecs);
+        Task <int>CountAsync(object countSpecs);
         #endregion
     }
 }

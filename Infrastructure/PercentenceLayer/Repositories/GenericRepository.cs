@@ -51,6 +51,19 @@ namespace PersistenceLayer.Repositories
             return await SpecificationEvaluator.CreateQuery(_dbContext.Set<TEntity>(), specifications).CountAsync();
 
         }
+
+        public async Task<int> CountAsync(object countSpecs)
+        {
+            if (countSpecs is ISpecifications<TEntity, TKey> spec)
+            {
+                return await CountAsync(spec);  // call the main typed method
+            }
+
+            throw new ArgumentException(
+                $"Expected {typeof(ISpecifications<TEntity, TKey>).Name}",
+                nameof(countSpecs));
+        }
+
         #endregion
     }
 }
