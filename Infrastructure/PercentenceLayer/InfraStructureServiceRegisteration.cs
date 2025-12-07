@@ -17,9 +17,10 @@ namespace PersistenceLayer
     {
         public static IServiceCollection AddInfraStructureService(this IServiceCollection Services, IConfiguration _configuration)
         {
-            Services.AddDbContext<StoreDbContext>(options =>
+            
+           Services.AddDbContext<StoreDbContext>(options =>
             {
-                options.UseSqlServer(_configuration.GetConnectionString("DefaultConncetion"));
+                options.UseSqlServer(_configuration.GetConnectionString("DefaultConnections"));
 
             });
             Services.AddScoped<IDataSeeding, DataSeeding>();
@@ -27,7 +28,7 @@ namespace PersistenceLayer
 
             Services.AddScoped<IBasketRepository, BasketRepository>();
 
-            Services.AddSingleton<IConnectionMultiplexer>( (_) =>
+            Services.AddSingleton<IConnectionMultiplexer>(  (_) =>
             {
                 return  ConnectionMultiplexer.Connect(_configuration.GetConnectionString("RedisConnectionString"));
 
