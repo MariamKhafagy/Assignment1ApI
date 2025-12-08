@@ -1,8 +1,11 @@
 ﻿using DomainLayer.Contracts;
+using DomainLayer.Models.IdentityModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PersistenceLayer.Data;
+using PersistenceLayer.Identity;
 using PersistenceLayer.Repositories;
 using StackExchange.Redis;
 using System;
@@ -33,6 +36,15 @@ namespace PersistenceLayer
 
 
             });
+
+            Services.AddDbContext<StoreIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(_configuration.GetConnectionString("IdentityConncetion"));
+
+            });
+
+            Services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>()
+          .AddEntityFrameworkStores<StoreIdentityDbContext>();
 
             return Services;
           

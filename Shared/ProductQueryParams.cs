@@ -21,7 +21,7 @@ namespace Shared
 
 
         public int PageIndex { get; set; } = 1;
-        private int pageSize { get; set; }
+        private int pageSize = DefultPageSize;
 
         public int PageSize
         {

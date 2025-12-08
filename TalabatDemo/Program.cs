@@ -1,13 +1,16 @@
 
 using Azure;
 using DomainLayer.Contracts;
+using DomainLayer.Models.IdentityModels;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.IdentityModel.Tokens.Experimental;
 using PersistenceLayer;
 using PersistenceLayer.Data;
+using PersistenceLayer.Identity;
 using PersistenceLayer.Repositories;
 using ServiceAbstractionLayer;
 using ServiceLayer;
@@ -38,17 +41,10 @@ namespace TalabatDemo
 
             //});
             #region Register User_defined Services
-            // builder.Services.AddScoped<IDataSeeding, DataSeeding>();
-            // builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+           
 
             builder.Services.AddInfraStructureService(builder.Configuration);
-
-            #region Mapping Regiser
-            // builder.Services.AddAutoMapper(p => p.AddProfile(new ProductProfile()));
-            // builder.Services.AddAutoMapper(p => p.AddProfile(new OrderProfile()));
-            // builder.Services.AddAutoMapper(p => p.AddProfiles(new ProductProfile()));
-
-            #endregion
+      
 
             builder.Services.AddAutoMapper((x) => { }, typeof(ServiceLayerAssemblyReference).Assembly);
             builder.Services.AddScoped<IServiceManager, ServiceManager>();
@@ -72,6 +68,8 @@ namespace TalabatDemo
             using var scope= app.Services.CreateScope();
            var seedObj= scope.ServiceProvider.GetRequiredService<IDataSeeding>();
            await seedObj.DataSeedAsync();
+            await seedObj.IdentityDataSeedAsync();
+
             #endregion
 
             #region Configure the HTTP request pipeline.
