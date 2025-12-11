@@ -18,6 +18,7 @@ using ServiceLayer.MappingProfiles;
 using Shared.Error_Models;
 using System.Threading.Tasks;
 using TalabatDemo.CustomMiddleWares;
+using TalabatDemo.Extentions;
 using TalabatDemo.Factories;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -32,15 +33,12 @@ namespace TalabatDemo
             // 
             #region Add services to the DI container.
             builder.Services.AddControllers();
+            builder.Services.AddSwaggerServices();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
 
-            //builder.Services.AddDbContext<StoreDbContext>(options =>
-            //{
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnecions"));
-
-            //});
             #region Register User_defined Services
+
            
 
             builder.Services.AddInfraStructureService(builder.Configuration);
@@ -59,9 +57,16 @@ namespace TalabatDemo
 
             });
 
+            //
+            builder.Services.AddApplicationServices();
+            builder.Services.AddInfraStructureService(builder.Configuration);
+          builder.Services.AddWebApplicationServices();
+
+
             #endregion
             #endregion
             var app = builder.Build();
+
 
             #region Data Seeding
 
@@ -71,6 +76,10 @@ namespace TalabatDemo
             await seedObj.IdentityDataSeedAsync();
 
             #endregion
+
+           await app.SeedDatabaseAsync();
+            
+
 
             #region Configure the HTTP request pipeline.
 
@@ -86,7 +95,7 @@ namespace TalabatDemo
 
             #endregion  
 
-            app.UseMiddleware<CustomExceptionHandlerMiddleWare>();
+            app.UseCustomExceptionMiddleware();
 
             if (app.Environment.IsDevelopment())
             {
