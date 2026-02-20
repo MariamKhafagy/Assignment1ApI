@@ -10,7 +10,7 @@ namespace DomainLayer.Models.IdentityModels
 {
     public class ApplicationUser : IdentityUser
     {
-        public string DispalyName { get; set; } = null!;
+        public string DispalyName { get; set; } = null!;  //Required
         public Address? Address { get; set; }
     }
 }

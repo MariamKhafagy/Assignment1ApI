@@ -1,4 +1,5 @@
 ﻿using DomainLayer.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Shared.Error_Models;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -33,28 +34,36 @@ namespace TalabatDemo.CustomMiddleWares
 
         private static async Task HandleExceptionAsync(HttpContext httpContext, Exception ex)
         {
+            //Create Responce Object
+            var response = new ErrorToReturn()
+            {
+                
+                ErrorMessage = ex.Message
+            };
+
             //Set Status Code for Responce
             httpContext.Response.StatusCode = ex switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                UnauthorizedException=>StatusCodes.Status401Unauthorized,
+                BadRequestException badRequestEx=> GetBadRequestErrors(badRequestEx ,response),
                 _ => StatusCodes.Status500InternalServerError
 
 
 
 
             };
-
-            //Create Responce Object
-            var response = new ErrorToReturn()
-            {
-                StatusCode = httpContext.Response.StatusCode,
-                ErrorMessage = ex.Message
-            };
+            response.StatusCode = httpContext.Response.StatusCode;
+           
 
             //Return Object As Json
             await httpContext.Response.WriteAsJsonAsync(response);
         }
-
+        private  static int GetBadRequestErrors(BadRequestException badRequestException, ErrorToReturn response)
+        { 
+          response.Errors=badRequestException.Errors;
+            return StatusCodes.Status400BadRequest;
+        }
         private static async Task HandleNotFoundEndPointAsync(HttpContext httpContext)
         {
             if (httpContext.Response.StatusCode == StatusCodes.Status404NotFound)
